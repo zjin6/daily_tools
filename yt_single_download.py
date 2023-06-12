@@ -1,23 +1,17 @@
 from pytube import YouTube
-# from pytube.cli import on_progress
 from datetime import datetime
 import time
-# import urllib.request
 import re
 import os
-# import pandas as pd
 
 
-url_video = input("Enter video collection link : ")
-mp3 = input("Download MP3? Y/N : ").upper()
-save_path = r'D:\YT_temp'   #input("Enter path to save : ")
-# print("\n" + url_video)
-print("save to ... " + save_path)
+url_video = input("enter url: ")
+mp3 = input("download MP3? Y/N: ").upper()
+save_path = r'D:\YT_temp'
+print("default path ... " + save_path)
 
 
-i = 0
-while i < 1:
-    
+while True:
     current_time = datetime.now().strftime("%H:%M")
     print("\n" + current_time)
     
@@ -27,17 +21,17 @@ while i < 1:
             progress_percent = ((total_size - bytes_remaining) / total_size) * 100
             time_spent = datetime.now() - start
             minutes_left = round(time_spent.total_seconds() / progress_percent * (100 - progress_percent) /60, 1)
-            print(str(int(progress_percent)) + '% | ' + str(minutes_left) + 'mins ... ', end='')        
+            print(str(int(progress_percent)) + '% | ' + str(minutes_left) + 'mins ... ', end='')
                 
-        yt = YouTube(url_video, on_progress_callback = progress_callback)
         start = datetime.now()
+        yt = YouTube(url_video, on_progress_callback = progress_callback)
         print('Title: ',yt.title)
         
         if mp3 =='Y' :
             ys = yt.streams.filter(only_audio=True)[4]
             print("download MP3 ... " + str(int(ys.filesize/10**6)) + ' MB')          
             out_file = ys.download(save_path)
-
+            # rename to .mp3
             base, ext = os.path.splitext(out_file)
             new_file = base + '.mp3'
             os.rename(out_file, new_file)
@@ -45,33 +39,16 @@ while i < 1:
         else:
             ys = yt.streams.get_highest_resolution()
             print("download Video ... " + str(int(ys.filesize/10**6)) + ' MB')
-            #print(str(int(ys.filesize/10**6)) + ' MB')
             ys.download(save_path) 
-             
-        print('\n' + 'download Subtitle ...')
-        if 'en' in yt.captions:
-            caption = yt.captions['en']
-        elif 'a.en' in yt.captions:
-            caption = yt.captions['a.en']
-        elif 'en-GB' in yt.captions:
-            caption = yt.captions['en-GB']   
-            
-        else:
-            print('no Subtitle, jump to next ...')
-            i += 1
-            continue            
 
-               
-        caption_text = caption.generate_srt_captions()
-        filename = re.sub(r'[<>:/\|?*"#,.\']+', '', yt.title) + '.srt'
-        caption_path = save_path + '\\' + filename
-        with open(caption_path, 'w', encoding='utf-8') as f:
-            f.write(caption_text)
-              
-        time_spent = datetime.now() - start
-        print('time: ' + str(time_spent).split('.')[0])  
-        i += 1
-        
+        total_time_spent = datetime.now() - start
+        total_seconds = total_time_spent.total_seconds()
+        download_speed = ys.filesize/10**6 / total_seconds
+        print('time spent: ' + str(total_time_spent).split('.')[0])          
+        print(f'overall speed: {download_speed:.1f} MB/second')
+
+        break
+
     except Exception as e:
         print("Exception --------------- : " + str(e))        
         
@@ -81,14 +58,3 @@ while i < 1:
                 time.sleep(1)                
         
         continue
-
-
-
-
-
-
-
-
-
-
-
