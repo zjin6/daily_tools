@@ -43,9 +43,9 @@ while True:
 
         total_time_spent = datetime.now() - start
         total_seconds = total_time_spent.total_seconds()
-        download_speed = ys.filesize/10**6 / total_seconds
+        download_speed = ys.filesize/10**6 / total_seconds * 60 # convert to MB/min
         print('time spent: ' + str(total_time_spent).split('.')[0])          
-        print(f'overall speed: {download_speed:.1f} MB/second')
+        print(f'overall speed: {download_speed:.1f} MB/min')
 
         break
 
