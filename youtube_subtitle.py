@@ -41,25 +41,25 @@ def english_subtitles(video_id, file_path):
         print("no English subtitles")
         
         
-def chinese_subtitles(video_id, file_path):
-     try:
-         # Get the transcript for the YouTube video in Chinese (simplified)
-         transcript_zh = YouTubeTranscriptApi.get_transcript(video_id, languages=['zh-Hans'])
+# def chinese_subtitles(video_id, file_path):
+#      try:
+#          # Get the transcript for the YouTube video in Chinese (simplified)
+#          transcript_zh = YouTubeTranscriptApi.get_transcript(video_id, languages=['zh-Hans'])
 
-         # Create a Chinese .srt file
-         with open(file_path, 'w') as f:
-             # Write each Chinese subtitle entry to the .srt file
-             for index, line in enumerate(transcript_zh):
-                 start_time = line['start']
-                 end_time = line['start'] + line['duration']
-                 subtitle_text = line['text']
-                 subtitle_entry = f"{index + 1}\n{convert_time(start_time)} --> {convert_time(end_time)}\n{subtitle_text}\n\n"
-                 f.write(subtitle_entry)
+#          # Create a Chinese .srt file
+#          with open(file_path, 'w') as f:
+#              # Write each Chinese subtitle entry to the .srt file
+#              for index, line in enumerate(transcript_zh):
+#                  start_time = line['start']
+#                  end_time = line['start'] + line['duration']
+#                  subtitle_text = line['text']
+#                  subtitle_entry = f"{index + 1}\n{convert_time(start_time)} --> {convert_time(end_time)}\n{subtitle_text}\n\n"
+#                  f.write(subtitle_entry)
 
-         print(f"Chinese subtitles saved: {file_path}")
+#          print(f"Chinese subtitles saved: {file_path}")
 
-     except Exception as e:
-         print("no Chinese subtitles")       
+#      except Exception as e:
+#          print("no Chinese subtitles")       
         
 
 def convert_time(seconds):
@@ -83,9 +83,9 @@ for video_id in video_ids:
     print(video_title)
     
     filename_en = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
-    filename_zh = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '-zh.srt'
+    # filename_zh = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '-zh.srt'
     file_path_en = os.path.join(save_path, filename_en)  
-    file_path_zh = os.path.join(save_path, filename_zh) 
+    # file_path_zh = os.path.join(save_path, filename_zh) 
     
     english_subtitles(video_id, file_path_en)
-    chinese_subtitles(video_id, file_path_zh)
+    # chinese_subtitles(video_id, file_path_zh)
