@@ -19,7 +19,7 @@ video_ids = list(video_ids)
 qty_video = len(video_ids)
 print(qty_video, 'videos found.')
 
-
+  
 def english_subtitles(video_id, file_path):
     try:
         # Get the transcript for the YouTube video in English
@@ -35,32 +35,29 @@ def english_subtitles(video_id, file_path):
                 subtitle_entry = f"{index + 1}\n{convert_time(start_time)} --> {convert_time(end_time)}\n{subtitle_text}\n\n"
                 f.write(subtitle_entry)
 
-        print(f"English subtitles saved: {file_path}")
+        print(f"saved: {file_path}")
+        return True
 
     except Exception as e:
-        print("no English subtitles")
+        print("Exception --------------- " + str(e))        
         
-        
-# def chinese_subtitles(video_id, file_path):
-#      try:
-#          # Get the transcript for the YouTube video in Chinese (simplified)
-#          transcript_zh = YouTubeTranscriptApi.get_transcript(video_id, languages=['zh-Hans'])
+        if 'is unavailable' in str(e) or 'member' in str(e) or 'streamingData' in str(e):
+            print("no authority to access, skip ...")  
+            return True
+           
+        elif 'IncompleteRead' in str(e):
+            print('try again ... ')
+            return False        
+       
+        elif 'HTTP Error 429' in str(e):           
+            for wait in range(5):
+                print(wait, end=' ')
+                time.sleep(1)
+            return False
+        else:
+            print('unknown exception to check ...')
+            return False
 
-#          # Create a Chinese .srt file
-#          with open(file_path, 'w') as f:
-#              # Write each Chinese subtitle entry to the .srt file
-#              for index, line in enumerate(transcript_zh):
-#                  start_time = line['start']
-#                  end_time = line['start'] + line['duration']
-#                  subtitle_text = line['text']
-#                  subtitle_entry = f"{index + 1}\n{convert_time(start_time)} --> {convert_time(end_time)}\n{subtitle_text}\n\n"
-#                  f.write(subtitle_entry)
-
-#          print(f"Chinese subtitles saved: {file_path}")
-
-#      except Exception as e:
-#          print("no Chinese subtitles")       
-        
 
 def convert_time(seconds):
     # Convert time in seconds to the format used in .srt files (HH:MM:SS,mmm)
@@ -71,7 +68,18 @@ def convert_time(seconds):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
-# Example usage: provide the YouTube video ID and save path
+def try_func(func_name, video_id, file_path, try_times=6):
+    run = 0
+    while run < try_times:
+        print(f'run {run + 1}, ', end=' ')
+        run_func = func_name(video_id, file_path)
+        if run_func:
+            break
+        else:
+            run += 1
+    print('next subtitle ...')
+
+
 for video_id in video_ids:
     current_time = datetime.now().strftime("%H:%M")
     print("\n" + current_time)
@@ -82,10 +90,6 @@ for video_id in video_ids:
     video_title = YouTube(url_video).title
     print(video_title)
     
-    filename_en = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
-    # filename_zh = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '-zh.srt'
-    file_path_en = os.path.join(save_path, filename_en)  
-    # file_path_zh = os.path.join(save_path, filename_zh) 
-    
-    english_subtitles(video_id, file_path_en)
-    # chinese_subtitles(video_id, file_path_zh)
+    filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
+    file_path = os.path.join(save_path, filename)  
+    try_func(english_subtitles, video_id, file_path)
