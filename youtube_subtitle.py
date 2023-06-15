@@ -75,7 +75,7 @@ def convert_time(seconds):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
-def try_func(func_name, video_id, file_path, try_times=6):
+def try_func(func_name, video_id, file_path, try_times=12):
     run = 0
     while run < try_times:
         print(f'run {run + 1}, ', end=' ')
