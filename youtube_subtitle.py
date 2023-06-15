@@ -11,7 +11,14 @@ from pytube import YouTube
 yt_link = input("Enter video collection link : ")
 save_path = input("Enter path to save : ")
 list_link = yt_link.split("?")[1]
-html = urllib.request.urlopen(yt_link)
+
+while True:
+    try:
+        html = urllib.request.urlopen(yt_link)
+        print('html ready ...')
+        break        
+    except Exception as e:
+        print("Exception urllib.request.urlopen --------------- " + str(e))    
 
 video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
 video_ids = pd.Series(video_ids).drop_duplicates()
@@ -26,7 +33,7 @@ def english_subtitles(video_id, file_path):
         transcript_en = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
 
         # Create an English .srt file
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             # Write each English subtitle entry to the .srt file
             for index, line in enumerate(transcript_en):
                 start_time = line['start']
@@ -39,7 +46,7 @@ def english_subtitles(video_id, file_path):
         return True
 
     except Exception as e:
-        print("Exception --------------- " + str(e))        
+        print("Exception YouTubeTranscriptApi.get_transcript --------------- " + str(e))        
         
         if 'is unavailable' in str(e) or 'member' in str(e) or 'streamingData' in str(e):
             print("no authority to access, skip ...")  
@@ -87,8 +94,13 @@ for video_id in video_ids:
     url_video = "https://www.youtube.com/watch?v=" + video_id
     print(url_video)
     
-    video_title = YouTube(url_video).title
-    print(video_title)
+    while True:
+        try:
+            video_title = YouTube(url_video).title
+            print(video_title)
+            break        
+        except Exception as e:
+            print("Exception YouTube().title --------------- " + str(e))              
     
     filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
     file_path = os.path.join(save_path, filename)  
