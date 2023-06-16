@@ -6,20 +6,27 @@ import pandas as pd
 from datetime import datetime
 import time
 from pytube import YouTube
+from request_try import retry
 
 
 yt_link = input("Enter video collection link : ")
 save_path = input("Enter path to save : ")
-list_link = yt_link.split("?")[1]
 
-while True:
-    try:
-        html = urllib.request.urlopen(yt_link)
-        print('html ready ...')
-        break        
-    except Exception as e:
-        print("Exception urllib.request.urlopen --------------- " + str(e))    
 
+@retry(max_attempts=None, sleep_time=0)
+def pull_html(yt_link):
+    html = urllib.request.urlopen(yt_link)
+    print('html ready ...')    
+    return html
+
+@retry(max_attempts=None, sleep_time=0)
+def pull_video_title(url_video):
+    video_title = YouTube(url_video).title
+    print(video_title) 
+    return video_title
+
+
+html = pull_html(yt_link)
 video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
 video_ids = pd.Series(video_ids).drop_duplicates()
 video_ids = list(video_ids)
@@ -94,14 +101,8 @@ for video_id in video_ids:
     url_video = "https://www.youtube.com/watch?v=" + video_id
     print(url_video)
     
-    while True:
-        try:
-            video_title = YouTube(url_video).title
-            print(video_title)
-            break        
-        except Exception as e:
-            print("Exception YouTube().title --------------- " + str(e))              
-    
+    video_title = pull_video_title(url_video)      
     filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
+    
     file_path = os.path.join(save_path, filename)  
     try_func(english_subtitles, video_id, file_path)
