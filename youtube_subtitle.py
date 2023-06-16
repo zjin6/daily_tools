@@ -53,7 +53,7 @@ def english_subtitles(video_id, file_path):
         return True
 
     except Exception as e:
-        print("Exception YouTubeTranscriptApi.get_transcript --------------- " + str(e))        
+        print("Exception YouTubeTranscriptApi.get_transcript --------------- \n" + str(e))        
         
         if 'is unavailable' in str(e) or 'member' in str(e) or 'streamingData' in str(e):
             print("no authority to access, skip ...")  
