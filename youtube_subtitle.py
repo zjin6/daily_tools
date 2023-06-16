@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import datetime
 import time
 from pytube import YouTube
-from request_try import retry
+from request_retry import retry
 
 
 yt_link = input("Enter video collection link : ")
