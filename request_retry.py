@@ -11,15 +11,27 @@ def retry(max_attempts=None, sleep_time=0):
             while True:
                 try:
                     result = func(*args, **kwargs)
-                    print(f"{func.__name__} succeeded.")
+                    # print(f"{func.__name__} succeeded.") # only for debugging
                     return result
                 except Exception as e:
                     attempts += 1
-                    if max_attempts is not None and attempts >= max_attempts:
+                    if 'is unavailable' in str(e) or 'member' in str(e) or 'streamingData' in str(e):
+                        print("no authority to access, skip ...")
+                        break
+                    elif max_attempts is not None and attempts >= max_attempts:
                         print(f"{func.__name__} failed after {attempts} attempts: {e}")
                         break
+                    elif 'IncompleteRead' in str(e):  
+                        _sleep_time = 0
+                    elif 'HTTP Error 429' in str(e):  
+                        _sleep_time = sleep_time
+                    else:
+                        print('unknown exception to check ...')
+                        _sleep_time = 0
+
                     print(f"{func.__name__} failed on attempt {attempts}: {e}")
-                    print(f"Retrying in {sleep_time} seconds...")
-                    time.sleep(sleep_time)
+                    for wait in range(_sleep_time):
+                        print(wait, end=' ')
+                        time.sleep(1)
         return wrapper
     return decorator
