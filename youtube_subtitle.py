@@ -43,10 +43,25 @@ def check_save_path(save_path, video_ids, default_save_path=r'D:\YT_temp'):
 fin_save_path = check_save_path(save_path, video_ids)
 
 
+english_code_set = ['en', 'en-US', 'a.en']
+@retry(max_attempts=12, sleep_time=5) 
+def get_language_code(video_id):
+    code_list = []
+    transcripts = YouTubeTranscriptApi.list_transcripts(video_id)
+    
+    print("Available Language Code: ", end='')
+    for transcript in transcripts: # to list all codes
+        language_code = transcript.language_code
+        print(language_code, end=' ')
+        if language_code in english_code_set:
+            code_list.append(language_code)
+    return code_list
+
+
 @retry(max_attempts=12, sleep_time=5)  
-def english_subtitles(video_id, file_path):
+def english_subtitles(video_id, file_path, language_code):
     # Get the transcript for the YouTube video in English
-    transcript_en = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+    transcript_en = YouTubeTranscriptApi.get_transcript(video_id, languages=[language_code])
 
     # Create an English .srt file
     with open(file_path, 'w', encoding='utf-8') as f:
@@ -89,5 +104,10 @@ for video_id in video_ids:
     video_title = pull_video_title(url_video)      
     filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
      
-    file_path = os.path.join(fin_save_path, filename)  
-    english_subtitles(video_id, file_path)
+    file_path = os.path.join(fin_save_path, filename)
+    code_list = get_language_code(video_id)
+    if code_list:
+        english_subtitles(video_id, file_path, code_list[0])
+    else:
+        continue
+    
