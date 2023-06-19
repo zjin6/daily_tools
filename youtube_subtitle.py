@@ -10,7 +10,7 @@ from request_retry import retry
 
 
 yt_link = input("yt link: ")
-save_path = input("path to save: ")
+input_path = input("path to save: ")
 
 
 @retry(max_attempts=None, sleep_time=0)
@@ -34,13 +34,13 @@ def get_video_ids(yt_link):
 video_ids = get_video_ids(yt_link)
 
 
-def check_save_path(save_path, video_ids, default_save_path=r'D:\YT_temp'):
-    if len(save_path) == 0 and len(video_ids) == 1:
-        fin_save_path = default_save_path
+def get_save_path(input_path, video_ids, default_path=r'D:\YT_temp'):
+    if len(input_path) == 0 and len(video_ids) == 1:
+        save_path = default_path
     else:
-        fin_save_path = save_path
-    return fin_save_path
-fin_save_path = check_save_path(save_path, video_ids)
+        save_path = input_path
+    return save_path
+save_path = get_save_path(input_path, video_ids)
 
 
 english_code_set = ['en', 'en-US', 'a.en']
@@ -104,7 +104,7 @@ for video_id in video_ids:
     video_title = pull_video_title(url_video)      
     filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
      
-    file_path = os.path.join(fin_save_path, filename)
+    file_path = os.path.join(save_path, filename)
     code_list = get_language_code(video_id)
     if code_list:
         english_subtitles(video_id, file_path, code_list[0])
