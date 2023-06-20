@@ -1,6 +1,5 @@
 from pytube import YouTube
 from datetime import datetime
-import time
 import urllib.request
 import re
 import pandas as pd
@@ -10,6 +9,7 @@ from request_retry import retry
 
 yt_link = input("yt link: ")
 input_path = input("path to save: ")
+is_mp3 = input("download MP3? Y/N: ").upper()
 
 
 @retry(max_attempts=None, sleep_time=0)
@@ -43,7 +43,7 @@ save_path = get_save_path(input_path, video_ids)
 
 
 @retry(max_attempts=12, sleep_time=5) 
-def get_video(url_video, save_path):
+def get_video_audio(url_video, save_path, is_mp3):
 
     def progress_callback(stream, chunk, bytes_remaining):
         total_size = ys.filesize
@@ -54,9 +54,19 @@ def get_video(url_video, save_path):
             
     start = datetime.now()        
     yt = YouTube(url_video, on_progress_callback = progress_callback)
-    ys = yt.streams.get_highest_resolution()
-    print("download Video ... " + str(int(ys.filesize/10**6)) + ' MB')
-    ys.download(save_path) 
+    
+    if is_mp3 =='Y' :
+        ys = yt.streams.filter(only_audio=True)[4]
+        print("download MP3 ... " + str(int(ys.filesize/10**6)) + ' MB')          
+        out_file = ys.download(save_path)
+        # rename to .mp3
+        base, ext = os.path.splitext(out_file)
+        new_file = base + '.mp3'
+        os.rename(out_file, new_file)
+    else:
+        ys = yt.streams.get_highest_resolution()
+        print("download Video ... " + str(int(ys.filesize/10**6)) + ' MB')
+        ys.download(save_path) 
     
     total_time_spent = datetime.now() - start
     total_seconds = total_time_spent.total_seconds()
@@ -80,4 +90,4 @@ for video_id in video_ids:
     print(url_video)
     
     pull_video_title(url_video)
-    get_video(url_video, save_path)
+    get_video_audio(url_video, save_path, is_mp3)
