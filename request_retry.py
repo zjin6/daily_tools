@@ -18,6 +18,9 @@ def retry(max_attempts=None, sleep_time=0):
                     if 'is unavailable' in str(e) or 'member' in str(e) or 'streamingData' in str(e):
                         print("no authority to access, skip ...")
                         break
+                    elif 'Subtitles are disabled' in str(e):
+                        print('Subtitles are disabled for this video ...')
+                        break
                     elif max_attempts is not None and attempts >= max_attempts:
                         print(f"{func.__name__} failed after {attempts} attempts: {e}")
                         break
