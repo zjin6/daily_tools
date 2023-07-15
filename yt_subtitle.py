@@ -73,7 +73,7 @@ def english_subtitles(video_id, file_path, language_code):
             subtitle_entry = f"{index + 1}\n{convert_time(start_time)} --> {convert_time(end_time)}\n{subtitle_text}\n\n"
             f.write(subtitle_entry)
 
-    print(f"saved: {file_path}")
+    print(f"\nsaved: {file_path}")
     print('next subtitle ...')    
     return f
 

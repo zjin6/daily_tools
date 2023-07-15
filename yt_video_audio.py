@@ -47,10 +47,10 @@ def get_video_audio(url_video, save_path, is_mp3):
 
     def progress_callback(stream, chunk, bytes_remaining):
         total_size = ys.filesize
-        progress_percent = int(((total_size - bytes_remaining) / total_size) * 100)
+        progress_percent = ((total_size - bytes_remaining) / total_size) * 100
         time_spent = datetime.now() - start
         minutes_left = round(time_spent.total_seconds() / progress_percent * (100 - progress_percent) /60, 1)
-        print(str(progress_percent) + '% | ' + str(minutes_left) + 'mins ... ', end='')        
+        print(str(int(progress_percent)) + '% | ' + str(minutes_left) + 'mins ... ', end='')        
             
     start = datetime.now()        
     yt = YouTube(url_video, on_progress_callback = progress_callback)
