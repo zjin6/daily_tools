@@ -4,12 +4,9 @@ import urllib.request
 import re
 import pandas as pd
 import os
-from request_retry import retry
+import csv
+from request_retry import retry, list_failed
 
-
-yt_link = input("yt link: ")
-input_path = input("path to save: ")
-is_mp3 = input("download MP3? Y/N: ").upper()
 
 
 @retry(max_attempts=None, sleep_time=0)
@@ -30,7 +27,6 @@ def get_video_ids(yt_link):
     else:
         video_ids = re.findall(r"watch\?v=(\S{11})", yt_link)
     return video_ids 
-video_ids = get_video_ids(yt_link)
 
 
 def get_save_path(input_path, video_ids, default_path=r'D:\YT_temp'):
@@ -39,7 +35,6 @@ def get_save_path(input_path, video_ids, default_path=r'D:\YT_temp'):
     else:
         save_path = input_path
     return save_path
-save_path = get_save_path(input_path, video_ids)
 
 
 @retry(max_attempts=12, sleep_time=5) 
@@ -82,12 +77,31 @@ def pull_video_title(url_video):
     return video_title
 
 
-for video_id in video_ids:
-    current_time = datetime.now().strftime("%H:%M")
-    print("\n" + current_time)
+if __name__ == '__main__':
     
-    url_video = "https://www.youtube.com/watch?v=" + video_id
-    print(url_video)
+    yt_link = input("yt link: ")
+    input_path = input("path to save: ")
+    is_mp3 = input("download MP3? Y/N: ").upper()
     
-    pull_video_title(url_video)
-    get_video_audio(url_video, save_path, is_mp3)
+    video_ids = get_video_ids(yt_link)
+    save_path = get_save_path(input_path, video_ids)
+    
+    for video_id in video_ids:
+        current_time = datetime.now().strftime("%H:%M")
+        print("\n" + current_time)
+        
+        url_video = "https://www.youtube.com/watch?v=" + video_id
+        print(url_video)
+        
+        pull_video_title(url_video)
+        get_video_audio(url_video, save_path, is_mp3)
+       
+    
+    file_name = "failed_url_video.csv"
+    file_path = os.path.join(save_path, file_name)
+    # Write the list to the CSV file
+    with open(file_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(list_failed)
+    print(f"\nfailure-downloadings saved to {file_path}: ")
+    print(list_failed)

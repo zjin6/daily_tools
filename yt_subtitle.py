@@ -6,7 +6,8 @@ import pandas as pd
 from datetime import datetime
 import time
 from pytube import YouTube
-from request_retry import retry
+import csv
+from request_retry import retry, list_failed
 
 
 yt_link = input("yt link: ")
@@ -110,4 +111,13 @@ for video_id in video_ids:
         english_subtitles(video_id, file_path, code_list[0])
     else:
         continue
+
     
+file_name = "failed_video_id.csv"
+file_path = os.path.join(save_path, file_name)
+# Write the list to the CSV file
+with open(file_path, "w", newline="") as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(list_failed)
+print(f"\nfailure-downloadings saved to {file_path}: ")
+print(list_failed)

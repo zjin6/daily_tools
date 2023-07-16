@@ -1,5 +1,7 @@
 import time
 
+
+list_failed = []
 def retry(max_attempts=None, sleep_time=0):
     """
     Decorator that retries the wrapped function `max_attempts` times, with a delay of `sleep_time` seconds between retries.
@@ -21,8 +23,12 @@ def retry(max_attempts=None, sleep_time=0):
                     elif 'Subtitles are disabled' in str(e):
                         print('Subtitles are disabled for this video ...')
                         break
+                    elif 'age' in str(e):
+                        print('age restriction for this video ...')
+                        break
                     elif max_attempts is not None and attempts >= max_attempts:
                         print(f"{func.__name__} failed after {attempts} attempts: {e}")
+                        list_failed.append(args[0])
                         break
                     elif 'IncompleteRead' in str(e):  
                         _sleep_time = 0
