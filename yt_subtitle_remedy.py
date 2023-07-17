@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 import csv
 from yt_video_audio import pull_video_title
-from yt_subtitle import get_language_code, english_subtitles, convert_time
+from yt_subtitle import get_language_code, english_subtitles
 from request_retry import list_failed
 
 

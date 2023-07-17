@@ -16,9 +16,11 @@ def pull_html(yt_link):
     return html
 
 
-keyword1 = 'playlist?list='
-keyword2 = 'www.youtube.com/@'
+
 def get_video_ids(yt_link):
+    keyword1 = 'playlist?list='
+    keyword2 = 'www.youtube.com/@'
+    
     if (keyword1 in yt_link) or (keyword2 in yt_link):
         html = pull_html(yt_link)
         video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
@@ -29,7 +31,7 @@ def get_video_ids(yt_link):
     return video_ids 
 
 
-def get_save_path(input_path, video_ids, default_path=r'D:\YT_temp'):
+def get_save_path(input_path, video_ids, default_path=r'D:\YT_temp2'):
     if len(input_path) == 0 and len(video_ids) == 1:
         save_path = default_path
     else:

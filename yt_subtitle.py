@@ -1,19 +1,11 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 import os
-import urllib.request
 import re
-import pandas as pd
 from datetime import datetime
-import time
-from pytube import YouTube
 import csv
 from request_retry import retry, list_failed
-from yt_video_audio import pull_html, get_video_ids, get_save_path, pull_video_title
+from yt_video_audio import get_video_ids, get_save_path, pull_video_title
 
-
-
-# keyword1 = 'playlist?list='
-# keyword2 = 'www.youtube.com/@'
 
 
 english_code_set = ['en', 'en-US', 'a.en']
