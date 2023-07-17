@@ -8,40 +8,12 @@ import time
 from pytube import YouTube
 import csv
 from request_retry import retry, list_failed
+from yt_video_audio import pull_html, get_video_ids, get_save_path, pull_video_title
 
 
-yt_link = input("yt link: ")
-input_path = input("path to save: ")
 
-
-@retry(max_attempts=None, sleep_time=0)
-def pull_html(yt_link):
-    html = urllib.request.urlopen(yt_link)
-    print('html ready ...')    
-    return html
-
-
-keyword1 = 'playlist?list='
-keyword2 = 'www.youtube.com/@'
-def get_video_ids(yt_link):
-    if (keyword1 in yt_link) or (keyword2 in yt_link):
-        html = pull_html(yt_link)
-        video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
-        video_ids = list(pd.Series(video_ids).drop_duplicates())
-        print(len(video_ids), 'videos found.') 
-    else:
-        video_ids = re.findall(r"watch\?v=(\S{11})", yt_link)
-    return video_ids 
-video_ids = get_video_ids(yt_link)
-
-
-def get_save_path(input_path, video_ids, default_path=r'D:\YT_temp'):
-    if len(input_path) == 0 and len(video_ids) == 1:
-        save_path = default_path
-    else:
-        save_path = input_path
-    return save_path
-save_path = get_save_path(input_path, video_ids)
+# keyword1 = 'playlist?list='
+# keyword2 = 'www.youtube.com/@'
 
 
 english_code_set = ['en', 'en-US', 'a.en']
@@ -88,36 +60,37 @@ def convert_time(seconds):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
-@retry(max_attempts=None, sleep_time=0)
-def pull_video_title(url_video):
-    video_title = YouTube(url_video).title
-    print(f'Title: {video_title}') 
-    return video_title
-
-
-for video_id in video_ids:
-    current_time = datetime.now().strftime("%H:%M")
-    print("\n" + current_time)
+if __name__ == '__main__':
     
-    url_video = "https://www.youtube.com/watch?v=" + video_id
-    print(url_video)
+    yt_link = input("yt link: ")
+    input_path = input("path to save: ")
     
-    video_title = pull_video_title(url_video)      
-    filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
-     
-    file_path = os.path.join(save_path, filename)
-    code_list = get_language_code(video_id)
-    if code_list:
-        english_subtitles(video_id, file_path, code_list[0])
-    else:
-        continue
-
+    video_ids = get_video_ids(yt_link)
+    save_path = get_save_path(input_path, video_ids)
     
-file_name = "failed_video_id.csv"
-file_path = os.path.join(save_path, file_name)
-# Write the list to the CSV file
-with open(file_path, "w", newline="") as csvfile:
-    writer = csv.writer(csvfile)
-    writer.writerow(list_failed)
-print(f"\nfailure-downloadings saved to {file_path}: ")
-print(list_failed)
+    for video_id in video_ids:
+        current_time = datetime.now().strftime("%H:%M")
+        print("\n" + current_time)
+        
+        url_video = "https://www.youtube.com/watch?v=" + video_id
+        print(url_video)
+        
+        video_title = pull_video_title(url_video)      
+        filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
+         
+        file_path = os.path.join(save_path, filename)
+        code_list = get_language_code(video_id)
+        if code_list:
+            english_subtitles(video_id, file_path, code_list[0])
+        else:
+            continue
+    
+        
+    file_name = "failed_video_id.csv"
+    file_path = os.path.join(save_path, file_name)
+    # Write the list to the CSV file
+    with open(file_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(list_failed)
+    print(f"\nfailure-downloadings saved to {file_path}: ")
+    print(list_failed)
