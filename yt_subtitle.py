@@ -58,7 +58,7 @@ if __name__ == '__main__':
     input_path = input("path to save: ")
     
     video_ids = get_video_ids(yt_link)
-    save_path = get_save_path(input_path, video_ids)
+    save_path = get_save_path(input_path)
     
     for video_id in video_ids:
         current_time = datetime.now().strftime("%H:%M")
