@@ -81,7 +81,6 @@ def pull_video_title(video_id):
 
 def get_failur_filepath(save_path, basename):   
     filename_without_ext = os.path.splitext(basename)[0]
-    print("Running module:", filename_without_ext)
     file_name = filename_without_ext + "_failed.csv"
     file_path = os.path.join(save_path, file_name)
     return file_path
@@ -104,7 +103,8 @@ def go_batch(video_ids):
     
     for video_id in video_ids:
         current_time = datetime.now().strftime("%H:%M")
-        print("\n" + current_time + " : " + video_id)
+        print("\n" + current_time)
+        print(video_id)
         
         pull_video_title(video_id)
         get_video_audio(video_id, save_path, is_mp3)

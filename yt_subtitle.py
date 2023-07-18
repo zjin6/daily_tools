@@ -2,7 +2,6 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import os
 import re
 from datetime import datetime
-import csv
 from request_retry import retry, list_failed
 from yt_video_audio import get_video_ids, get_save_path, pull_video_title, get_failur_filepath, save_failur_downloadings
 
@@ -59,11 +58,9 @@ def go_batch(video_ids):
     for video_id in video_ids:
         current_time = datetime.now().strftime("%H:%M")
         print("\n" + current_time)
+        print(video_id)
         
-        url_video = "https://www.youtube.com/watch?v=" + video_id
-        print(url_video)
-        
-        video_title = pull_video_title(url_video)      
+        video_title = pull_video_title(video_id)      
         filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
          
         filepath = os.path.join(save_path, filename)
