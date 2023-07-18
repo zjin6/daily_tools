@@ -4,13 +4,13 @@ import re
 from datetime import datetime
 import csv
 from request_retry import retry, list_failed
-from yt_video_audio import get_video_ids, get_save_path, pull_video_title
+from yt_video_audio import get_video_ids, get_save_path, pull_video_title, get_failur_filepath, save_failur_downloadings
 
 
 
-english_code_set = ['en', 'en-US', 'a.en']
 @retry(max_attempts=12, sleep_time=5) 
 def get_language_code(video_id):
+    english_code_set = ['en', 'en-US', 'a.en']
     code_list = []
     transcripts = YouTubeTranscriptApi.list_transcripts(video_id)
     
@@ -24,12 +24,12 @@ def get_language_code(video_id):
 
 
 @retry(max_attempts=12, sleep_time=5)  
-def english_subtitles(video_id, file_path, language_code):
+def english_subtitles(video_id, filepath, language_code):
     # Get the transcript for the YouTube video in English
     transcript_en = YouTubeTranscriptApi.get_transcript(video_id, languages=[language_code])
 
     # Create an English .srt file
-    with open(file_path, 'w', encoding='utf-8') as f:
+    with open(filepath, 'w', encoding='utf-8') as f:
         # Write each English subtitle entry to the .srt file
         for index, line in enumerate(transcript_en):
             start_time = line['start']
@@ -38,7 +38,7 @@ def english_subtitles(video_id, file_path, language_code):
             subtitle_entry = f"{index + 1}\n{convert_time(start_time)} --> {convert_time(end_time)}\n{subtitle_text}\n\n"
             f.write(subtitle_entry)
 
-    print(f"\nsaved: {file_path}")
+    print(f"\nsaved: {filepath}")
     print('next subtitle ...')    
     return f
 
@@ -70,19 +70,13 @@ if __name__ == '__main__':
         video_title = pull_video_title(url_video)      
         filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
          
-        file_path = os.path.join(save_path, filename)
+        filepath = os.path.join(save_path, filename)
         code_list = get_language_code(video_id)
         if code_list:
-            english_subtitles(video_id, file_path, code_list[0])
+            english_subtitles(video_id, filepath, code_list[0])
         else:
             continue
     
-        
-    file_name = "failed_video_id.csv"
-    file_path = os.path.join(save_path, file_name)
-    # Write the list to the CSV file
-    with open(file_path, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(list_failed)
-    print(f"\nfailure-downloadings saved to {file_path}: ")
-    print(list_failed)
+    basename = os.path.basename(__file__)
+    file_path = get_failur_filepath(save_path, basename)
+    save_failur_downloadings(file_path, list_failed)
