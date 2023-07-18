@@ -52,12 +52,8 @@ def convert_time(seconds):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
-if __name__ == '__main__':
-    
-    yt_link = input("yt link: ")
+def go_batch(video_ids):
     input_path = input("path to save: ")
-    
-    video_ids = get_video_ids(yt_link)
     save_path = get_save_path(input_path)
     
     for video_id in video_ids:
@@ -74,9 +70,13 @@ if __name__ == '__main__':
         code_list = get_language_code(video_id)
         if code_list:
             english_subtitles(video_id, filepath, code_list[0])
-        else:
-            continue
     
     basename = os.path.basename(__file__)
     file_path = get_failur_filepath(save_path, basename)
-    save_failur_downloadings(file_path, list_failed)
+    save_failur_downloadings(file_path, list_failed)    
+
+
+if __name__ == '__main__':    
+    yt_link = input("yt link: ")
+    video_ids = get_video_ids(yt_link)
+    go_batch(video_ids)

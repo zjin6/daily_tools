@@ -96,13 +96,9 @@ def save_failur_downloadings(file_path, list_failed):
     return csvfile
 
 
-if __name__ == '__main__':
-    
-    yt_link = input("yt link: ")
+def go_batch(video_ids):   
     input_path = input("path to save: ")
-    is_mp3 = input("download MP3? Y/N: ").upper()
-    
-    video_ids = get_video_ids(yt_link)
+    is_mp3 = input("download MP3? Y/N: ").upper()   
     save_path = get_save_path(input_path)
     
     for video_id in video_ids:
@@ -117,4 +113,11 @@ if __name__ == '__main__':
        
     basename = os.path.basename(__file__)
     file_path = get_failur_filepath(save_path, basename)
-    save_failur_downloadings(file_path, list_failed)
+    save_failur_downloadings(file_path, list_failed)    
+
+
+if __name__ == '__main__':   
+    yt_link = input("yt link: ")
+    video_ids = get_video_ids(yt_link)    
+    go_batch(video_ids)
+    
