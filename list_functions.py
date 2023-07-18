@@ -1,8 +1,8 @@
 import inspect
 import importlib
+import os
 
 
-module_name = input('module name: ')
 
 def get_functions(module_name):
     # Import the module dynamically
@@ -29,12 +29,15 @@ def get_functions(module_name):
 
     # Return the list of functions
     return functions
-
-
-
-
-functions = get_functions(module_name)
-for fun_name in functions:
-    print(fun_name)
     
 
+if __name__ == "__main__":
+    filename = os.path.basename(__file__)
+    filename_without_ext = os.path.splitext(filename)[0]
+    print(filename_without_ext + " is running ...")
+    
+    module_name = input('search functions in module: ')
+    print('-' * 40)
+    functions = get_functions(module_name)
+    for i, func_name in enumerate(functions):
+        print(i+1, func_name)

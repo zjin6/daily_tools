@@ -16,7 +16,6 @@ def pull_html(yt_link):
     return html
 
 
-
 def get_video_ids(yt_link):
     keyword1 = 'playlist?list='
     keyword2 = 'www.youtube.com/@'
@@ -31,8 +30,8 @@ def get_video_ids(yt_link):
     return video_ids 
 
 
-def get_save_path(input_path, video_ids, default_path=r'D:\YT_temp2'):
-    if len(input_path) == 0 and len(video_ids) == 1:
+def get_save_path(input_path, default_path=r'D:\YT_temp2'):
+    if len(input_path) == 0:
         save_path = default_path
     else:
         save_path = input_path
@@ -79,6 +78,24 @@ def pull_video_title(url_video):
     return video_title
 
 
+def get_failur_filepath(save_path, basename):   
+    filename_without_ext = os.path.splitext(basename)[0]
+    print("Running module:", filename_without_ext)
+    file_name = filename_without_ext + "_failed.csv"
+    file_path = os.path.join(save_path, file_name)
+    return file_path
+
+
+def save_failur_downloadings(file_path, list_failed):   
+    # Write the list to the CSV file
+    with open(file_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(list_failed)
+    print(f"\nfailure-downloadings saved to {file_path}: ")
+    print(list_failed)
+    return csvfile
+
+
 if __name__ == '__main__':
     
     yt_link = input("yt link: ")
@@ -98,12 +115,6 @@ if __name__ == '__main__':
         pull_video_title(url_video)
         get_video_audio(url_video, save_path, is_mp3)
        
-    
-    file_name = "failed_url_video.csv"
-    file_path = os.path.join(save_path, file_name)
-    # Write the list to the CSV file
-    with open(file_path, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(list_failed)
-    print(f"\nfailure-downloadings saved to {file_path}: ")
-    print(list_failed)
+    basename = os.path.basename(__file__)
+    file_path = get_failur_filepath(save_path, basename)
+    save_failur_downloadings(file_path, list_failed)
