@@ -39,8 +39,8 @@ def get_save_path(input_path, default_path=r'D:\YT_temp2'):
 
 
 @retry(max_attempts=12, sleep_time=5) 
-def get_video_audio(url_video, save_path, is_mp3):
-
+def get_video_audio(video_id, save_path, is_mp3):
+    url_video = "https://www.youtube.com/watch?v=" + video_id
     def progress_callback(stream, chunk, bytes_remaining):
         total_size = ys.filesize
         progress_percent = ((total_size - bytes_remaining) / total_size) * 100
@@ -72,7 +72,8 @@ def get_video_audio(url_video, save_path, is_mp3):
 
 
 @retry(max_attempts=None, sleep_time=0)
-def pull_video_title(url_video):
+def pull_video_title(video_id):
+    url_video = "https://www.youtube.com/watch?v=" + video_id
     video_title = YouTube(url_video).title
     print(f'Title: {video_title}') 
     return video_title
@@ -103,13 +104,10 @@ def go_batch(video_ids):
     
     for video_id in video_ids:
         current_time = datetime.now().strftime("%H:%M")
-        print("\n" + current_time)
+        print("\n" + current_time + " : " + video_id)
         
-        url_video = "https://www.youtube.com/watch?v=" + video_id
-        print(url_video)
-        
-        pull_video_title(url_video)
-        get_video_audio(url_video, save_path, is_mp3)
+        pull_video_title(video_id)
+        get_video_audio(video_id, save_path, is_mp3)
        
     basename = os.path.basename(__file__)
     file_path = get_failur_filepath(save_path, basename)
