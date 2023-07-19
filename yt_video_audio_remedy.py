@@ -1,38 +1,28 @@
 import os
-from datetime import datetime
 import csv
-from yt_video_audio import pull_video_title, get_video_audio
-from request_retry import list_failed
+from yt_video_audio import get_save_path, get_failur_filepath, batch_video_audio
 
 
-folder_path = input("folder: ")
-is_mp3 = input("download MP3? Y/N: ").upper()
 
-file_name = "failed_url_video.csv"
-file_path = os.path.join(folder_path, file_name)
-
-
-# Read the CSV file into a list
-failed_url_video = []
-with open(file_path, "r") as csvfile:
-    reader = csv.reader(csvfile)
-    for row in reader:
-        failed_url_video.extend(row)
-print(failed_url_video)
+def fetch_video_ids(file_path):
+    # Read the CSV file into a list
+    video_ids = []
+    with open(file_path, "r") as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            video_ids.extend(row)
+    print(video_ids)
+    return video_ids
 
 
-for url_video in failed_url_video :
-    current_time = datetime.now().strftime("%H:%M")
-    print("\n" + current_time)
-    print(url_video)
+if __name__ == '__main__':   
+    input_path = input("path to save: ") 
+    save_path = get_save_path(input_path)
+
+    basename = os.path.basename(__file__)
+    basename = basename.replace("_remedy", "")
+    file_path = get_failur_filepath(save_path, basename)   
+    video_ids = fetch_video_ids(file_path) 
     
-    pull_video_title(url_video)
-    get_video_audio(url_video, folder_path, is_mp3)
+    batch_video_audio(video_ids, save_path)
     
-    
-# Write the list to the CSV file
-with open(file_path, "w", newline="") as csvfile:
-    writer = csv.writer(csvfile)
-    writer.writerow(list_failed)
-print(f"\nfailure-downloadings saved to {file_path}: ")
-print(list_failed)
