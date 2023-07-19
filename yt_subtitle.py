@@ -23,7 +23,7 @@ def get_language_code(video_id):
 
 
 @retry(max_attempts=12, sleep_time=5)  
-def english_subtitles(video_id, filepath, language_code):
+def english_subtitle(video_id, filepath, language_code):
     # Get the transcript for the YouTube video in English
     transcript_en = YouTubeTranscriptApi.get_transcript(video_id, languages=[language_code])
 
@@ -51,8 +51,7 @@ def convert_time(seconds):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
-def go_batch(video_ids):
-    input_path = input("path to save: ")
+def batch_subtitle(video_ids, input_path):
     save_path = get_save_path(input_path)
     
     for video_id in video_ids:
@@ -66,7 +65,7 @@ def go_batch(video_ids):
         filepath = os.path.join(save_path, filename)
         code_list = get_language_code(video_id)
         if code_list:
-            english_subtitles(video_id, filepath, code_list[0])
+            english_subtitle(video_id, filepath, code_list[0])
     
     basename = os.path.basename(__file__)
     file_path = get_failur_filepath(save_path, basename)
@@ -75,5 +74,6 @@ def go_batch(video_ids):
 
 if __name__ == '__main__':    
     yt_link = input("yt link: ")
+    input_path = input("path to save: ")    
     video_ids = get_video_ids(yt_link)
-    go_batch(video_ids)
+    batch_subtitle(video_ids, input_path)
