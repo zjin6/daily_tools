@@ -96,9 +96,8 @@ def save_failur_downloadings(file_path, list_failed):
     return csvfile
 
 
-def batch_video_audio(video_ids, input_path):   
+def batch_video_audio(video_ids, save_path):   
     is_mp3 = input("download MP3? Y/N: ").upper()   
-    save_path = get_save_path(input_path)
     
     for video_id in video_ids:
         current_time = datetime.now().strftime("%H:%M")
@@ -116,6 +115,8 @@ def batch_video_audio(video_ids, input_path):
 if __name__ == '__main__':   
     yt_link = input("yt link: ")
     input_path = input("path to save: ")    
-    video_ids = get_video_ids(yt_link)    
-    batch_video_audio(video_ids, input_path)
+    
+    video_ids = get_video_ids(yt_link)  
+    save_path = get_save_path(input_path)    
+    batch_video_audio(video_ids, save_path)
     

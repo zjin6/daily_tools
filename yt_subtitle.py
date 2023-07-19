@@ -51,8 +51,7 @@ def convert_time(seconds):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
 
-def batch_subtitle(video_ids, input_path):
-    save_path = get_save_path(input_path)
+def batch_subtitle(video_ids, save_path):
     
     for video_id in video_ids:
         current_time = datetime.now().strftime("%H:%M")
@@ -75,5 +74,7 @@ def batch_subtitle(video_ids, input_path):
 if __name__ == '__main__':    
     yt_link = input("yt link: ")
     input_path = input("path to save: ")    
+    
     video_ids = get_video_ids(yt_link)
-    batch_subtitle(video_ids, input_path)
+    save_path = get_save_path(input_path)    
+    batch_subtitle(video_ids, save_path)
