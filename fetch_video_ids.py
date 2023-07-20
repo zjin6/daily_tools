@@ -1,6 +1,6 @@
 import pyperclip
 import pyautogui
-from pytube import YouTube
+import re
 from yt_video_audio import save_failur_downloadings
 
 
@@ -10,7 +10,7 @@ pyautogui.sleep(5)
 
 
 def copy_url():
-    print('\npyautogui starts to copy url ...')
+    print('\ncopy url ...')
     urls = []
     i = 0
     
@@ -24,22 +24,21 @@ def copy_url():
             
         if url in urls: break
         urls.append(url)
-        print(i, url[:50])  # do whatever you want with the URL
+        print(i, url[:50]) # limit length of printing to see one line only
     
     return urls
     
 
 def url_2_id(video_urls):
-    print('\npytube starts to convert url 2 id ... below exceptions ...')
+    print('\nconvert to id ... below not youtube video links ...')
     video_ids = []
     
     for i, url in enumerate(video_urls):
-        try: # if not youtube video url
-            yt = YouTube(url)
-            video_id = yt.video_id
-            video_ids.append(video_id)  
+        try:
+            video_id = re.search(r'(?<=https://www\.youtube\.com/watch\?v=)[^&]+', url).group(0)
+            video_ids.append(video_id)
         except Exception as e:
-            print(i+1, str(e)[:50])
+            print(i+1, url[:50])
     
     print("\nfetched ids:")
     print(video_ids)
@@ -54,17 +53,3 @@ if __name__ == '__main__':
     video_ids = url_2_id(video_urls)
     save_failur_downloadings(file_path1, video_urls)
     save_failur_downloadings(file_path2, video_urls)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
