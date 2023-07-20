@@ -46,10 +46,10 @@ def url_2_id(video_urls):
    
 
 if __name__ == '__main__':  
-    file_path1 = r"D:\YT2\yt_video_audio_failed.csv"
-    file_path2 = r"D:\YT2\yt_subtitle_failed.csv"
+    file_path1 = r"D:\YT_temp2\yt_video_audio_failed.csv"
+    file_path2 = r"D:\YT_temp2\yt_subtitle_failed.csv"
 
     video_urls = copy_url()
     video_ids = url_2_id(video_urls)
-    save_failur_downloadings(file_path1, video_urls)
-    save_failur_downloadings(file_path2, video_urls)
+    save_failur_downloadings(file_path1, video_ids)
+    save_failur_downloadings(file_path2, video_ids)
