@@ -1,4 +1,4 @@
-from pytube import YouTube
+from pytube import YouTube, Playlist
 from datetime import datetime
 import urllib.request
 import re
@@ -20,13 +20,18 @@ def get_video_ids(yt_link):
     keyword1 = 'playlist?list='
     keyword2 = 'www.youtube.com/@'
     
-    if (keyword1 in yt_link) or (keyword2 in yt_link):
+    if keyword1 in yt_link:
+        playlist = Playlist(yt_link)
+        re_context = str(playlist.video_urls)
+    elif keyword2 in yt_link:
         html = pull_html(yt_link)
-        video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
-        video_ids = list(pd.Series(video_ids).drop_duplicates())
-        print(len(video_ids), 'videos found.') 
+        re_context = html.read().decode()
     else:
-        video_ids = re.findall(r"watch\?v=(\S{11})", yt_link)
+        re_context = yt_link
+
+    video_ids = re.findall(r"watch\?v=(\S{11})", re_context)
+    video_ids = list(pd.Series(video_ids).drop_duplicates())
+    print(len(video_ids), 'videos found.') 
     return video_ids 
 
 
