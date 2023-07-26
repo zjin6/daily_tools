@@ -36,7 +36,7 @@ while True:
     print(suffix[1:].upper() + ' is saved.')
             
     driver.close()
-    time_sleep = 3600 * 4 - (datetime.now() - now).total_seconds()
+    time_sleep = 3600 * 2 - (datetime.now() - now).total_seconds()
     print('sleeping 4 hours ... ', flush=True)
     time.sleep(time_sleep)
     
