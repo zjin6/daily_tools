@@ -2,12 +2,13 @@ import re
 import time
 from datetime import timedelta
 import keyboard
+import pandas as pd
+
 
 
 def parse_srt_file(filename):
     with open(filename, 'r') as file:
         content = file.read()
-
     pattern = r'(\d+)\n(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})\n(.*?)\n\n'
     matches = re.findall(pattern, content, re.DOTALL)
 
@@ -20,6 +21,7 @@ def parse_srt_file(filename):
 
     return subtitles
 
+
 def format_timedelta(td):
     total_seconds = int(td.total_seconds())
     hours = total_seconds // 3600
@@ -31,58 +33,82 @@ def format_timedelta(td):
     else:
         return "{:02d}:{:02d}".format(minutes, seconds)
 
-def print_subtitle(subtitles, playtime, printed_subtitles):
+
+def print_subtitle(subtitles, playtime, printed_subtitles, alltensplur_dict):
     for subtitle in subtitles:
         if subtitle[0] <= playtime <= subtitle[1] and subtitle not in printed_subtitles:
             print(subtitle[2])
+            words = subtitle[2].split()
+            for word in words:
+                if len(word) > 4:
+                    print(f'  {word} : {alltensplur_dict.get(word, "NF")}')
             printed_subtitles.append(subtitle)
 
-# Example usage
-filepath = input("path to the .srt file: ")
-subtitles = parse_srt_file(filepath)
 
-printed_subtitles = []
-last_printed_playtime = timedelta(seconds=0)
-paused = False
-pause_start_time = None
-elapsed_pause_time = 0
+def file_todic(filepath=r"C:\Users\zjin6\Downloads\toefl9400_x.xlsx"):
+    df = pd.read_excel(filepath)
+    alltensplur_dict = {}
 
-start_time = time.time()
-while True:
-    if keyboard.is_pressed(" "):
+    for index, row in df.iterrows():
+        key = row['tensplur']
+        value = row['Chin']
+        alltensplur_dict[key] = value
+    
+    # print(alltensplur_dict)
+    return alltensplur_dict
+
+
+def run_fromfile(filepath, alltensplur_dict):
+    subtitles = parse_srt_file(filepath)
+    printed_subtitles = []
+    last_printed_playtime = timedelta(seconds=0)
+    paused = False
+    pause_start_time = None
+    elapsed_pause_time = 0
+    
+    start_time = time.time()
+    while True:
+        if keyboard.is_pressed(" "):
+            if not paused:
+                paused = True
+                pause_start_time = time.time()
+            else:
+                paused = False
+                elapsed_pause_time += time.time() - pause_start_time
+            time.sleep(0.2)  # Wait for key release to avoid multiple toggles
+    
         if not paused:
-            paused = True
-            pause_start_time = time.time()
-        else:
-            paused = False
-            elapsed_pause_time += time.time() - pause_start_time
-        time.sleep(0.2)  # Wait for key release to avoid multiple toggles
+            current_time = time.time()
+            elapsed_time = current_time - start_time - elapsed_pause_time
+            playtime = timedelta(seconds=elapsed_time)
+            print_subtitle(subtitles, playtime, printed_subtitles, alltensplur_dict)
+    
+            # Check if all subtitles have been printed
+            if playtime.seconds >= subtitles[-1][0].seconds:
+                break
+    
+            # Print playtime every 15 seconds
+            if playtime - last_printed_playtime >= timedelta(seconds=15):
+                print('\n'+'-'*50, format_timedelta(playtime))
+                last_printed_playtime = playtime
+    
+        # Adjust sleep duration as needed
+        time.sleep(0.1)
 
-    if not paused:
-        current_time = time.time()
-        elapsed_time = current_time - start_time - elapsed_pause_time
-        playtime = timedelta(seconds=elapsed_time)
-        print_subtitle(subtitles, playtime, printed_subtitles)
 
-        # Check if all subtitles have been printed
-        if playtime.seconds >= subtitles[-1][0].seconds:
-            break
-
-        # Print playtime every 15 seconds
-        if playtime - last_printed_playtime >= timedelta(seconds=15):
-            print('\n'+'-'*50, format_timedelta(playtime))
-            last_printed_playtime = playtime
-
-    # Adjust sleep duration as needed
-    time.sleep(0.1)
-
+if __name__ == '__main__':
+    alltensplur_dict = file_todic(filepath=r"C:\Users\zjin6\Downloads\toefl9400_x.xlsx")
+    
+    filepath = input("path to the .srt file: ")
+    run_fromfile(filepath, alltensplur_dict)
 
 
 
 
+# from termcolor import colored
 
-
-
+# print(colored('This is the first line in a bigger font', 'green', attrs=['bold']), end=' ')
+# print('and this is the second line in a normal font.')
 
 
 
