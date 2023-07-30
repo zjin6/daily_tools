@@ -53,15 +53,14 @@ def dict_todf(alltensplur_dict):
 
 if __name__ == '__main__':
 
-    df_toelf9400 = pd.read_excel(r'C:\Users\zjin6\Downloads\toefl9400.xlsx')
+    df_toelf9400 = pd.read_excel(r'C:\Users\zjin6\Downloads\ecdict_cet6.xlsx')
     word_list = df_toelf9400['Word'].tolist()
     
     alltensplur_dict = batch_tensplur_todic(word_list)
     df_tensplur = dict_todf(alltensplur_dict)
     
     merged_df = pd.merge(df_tensplur, df_toelf9400, on='Word', how='left')
-    merged_df.to_excel(r"C:\Users\zjin6\Downloads\toefl9400_tensplur.xlsx")
-
+    merged_df.to_excel(r"C:\Users\zjin6\Downloads\ecdict_cet6_tensplur.xlsx")
 
 
 

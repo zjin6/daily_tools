@@ -3,6 +3,9 @@ import time
 from datetime import timedelta
 import keyboard
 import pandas as pd
+import colorama
+from colorama import Fore, Style
+colorama.init()
 
 
 
@@ -34,24 +37,49 @@ def format_timedelta(td):
         return "{:02d}:{:02d}".format(minutes, seconds)
 
 
-def print_subtitle(subtitles, playtime, printed_subtitles, alltensplur_dict):
+def batch_subtitle_explanation(subtitles, playtime, printed_subtitles, explained_words, alltensplur_dict):
     for subtitle in subtitles:
-        if subtitle[0] <= playtime <= subtitle[1] and subtitle not in printed_subtitles:
-            print(subtitle[2])
-            words = subtitle[2].split()
-            for word in words:
-                if len(word) > 4:
-                    print(f'  {word} : {alltensplur_dict.get(word, "NF")}')
+        if (subtitle[2] != ' ') and (subtitle[0] <= playtime <= subtitle[1]) and (subtitle not in printed_subtitles):
+            print(Style.RESET_ALL)
+            left_space = 60 - len(subtitle[2]) # assume total print lenth=60, adjustable
+            print('\n'  + '-' * 60 + format_timedelta(playtime))
+            print(subtitle[2] + ' ' + '-' * left_space + ' ' + format_timedelta(playtime) + '\n') # + Fore.RESET, Style.BRIGHT + 
+            print_explanation(subtitle, explained_words, alltensplur_dict)
             printed_subtitles.append(subtitle)
 
 
-def file_todic(filepath=r"C:\Users\zjin6\Downloads\toefl9400_x.xlsx"):
+def print_explanation(subtitle, explained_words, alltensplur_dict):
+    words = subtitle[2].split()
+    for word in words:
+        if (len(word) > 4) and (word not in explained_words):
+            try:
+                explanations = alltensplur_dict[word].split('\\n')
+                for i, explanation in enumerate(explanations):
+                    if i == 0:
+                        head = word + ' : '
+                    else:
+                        head = " " * (len(word) + 3)
+                    print(Fore.GREEN + f' {head}{explanation}') # + Style.BRIGHT + Fore.GREEN 
+                print()
+                explained_words.append(word)
+            except Exception:
+                continue    
+
+
+def batch_explanation(subtitles, playtime, printed_subtitles, explained_words, alltensplur_dict):
+    for subtitle in subtitles:
+        if (subtitle[2] != ' ') and (subtitle[0] <= playtime <= subtitle[1]) and (subtitle not in printed_subtitles):
+            print_explanation(subtitle, explained_words, alltensplur_dict)
+            printed_subtitles.append(subtitle)
+
+
+def file_todic(filepath=r"C:\Users\zjin6\Downloads\ecdict_cet6_tensplur.xlsx"):
     df = pd.read_excel(filepath)
     alltensplur_dict = {}
 
     for index, row in df.iterrows():
         key = row['tensplur']
-        value = row['Chin']
+        value = row['definition']
         alltensplur_dict[key] = value
     
     # print(alltensplur_dict)
@@ -61,7 +89,8 @@ def file_todic(filepath=r"C:\Users\zjin6\Downloads\toefl9400_x.xlsx"):
 def run_fromfile(filepath, alltensplur_dict):
     subtitles = parse_srt_file(filepath)
     printed_subtitles = []
-    last_printed_playtime = timedelta(seconds=0)
+    explained_words = []
+    # last_printed_playtime = timedelta(seconds=0)
     paused = False
     pause_start_time = None
     elapsed_pause_time = 0
@@ -81,45 +110,26 @@ def run_fromfile(filepath, alltensplur_dict):
             current_time = time.time()
             elapsed_time = current_time - start_time - elapsed_pause_time
             playtime = timedelta(seconds=elapsed_time)
-            print_subtitle(subtitles, playtime, printed_subtitles, alltensplur_dict)
+            batch_explanation(subtitles, playtime, printed_subtitles, explained_words, alltensplur_dict)
     
             # Check if all subtitles have been printed
             if playtime.seconds >= subtitles[-1][0].seconds:
                 break
     
             # Print playtime every 15 seconds
-            if playtime - last_printed_playtime >= timedelta(seconds=15):
-                print('\n'+'-'*50, format_timedelta(playtime))
-                last_printed_playtime = playtime
+            # if playtime - last_printed_playtime >= timedelta(seconds=15):
+            #     print('\n'+'-'*50, format_timedelta(playtime))
+            #     last_printed_playtime = playtime
     
         # Adjust sleep duration as needed
         time.sleep(0.1)
 
 
 if __name__ == '__main__':
-    alltensplur_dict = file_todic(filepath=r"C:\Users\zjin6\Downloads\toefl9400_x.xlsx")
+    print('loading dictionary ...')
+    alltensplur_dict = file_todic(filepath=r"C:\Users\zjin6\Downloads\ecdict_cet6_tensplur.xlsx")
     
     filepath = input("path to the .srt file: ")
     run_fromfile(filepath, alltensplur_dict)
 
 
-
-
-# from termcolor import colored
-
-# print(colored('This is the first line in a bigger font', 'green', attrs=['bold']), end=' ')
-# print('and this is the second line in a normal font.')
-
-
-
-
-
-
-
-
-
-
-
-
-# subtitles = parse_srt_file(r"C:\Users\zjin6\Music\Everyday Life Conversations\A Trip to London.srt")
-#         print('\n'+'-'*50, format_timedelta(playtime))
