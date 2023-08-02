@@ -4,6 +4,7 @@ import pandas as pd
 
 
 def get_tenses(word):
+    # print(word)
     tenses = {conjugate(word, tense='1sg'),
             conjugate(word, tense='2sg'),
             conjugate(word, tense='3sg'),
@@ -46,21 +47,21 @@ def dict_todf(alltensplur_dict):
         for tensplur in key:
             data.append([tensplur, value])
     
-    df = pd.DataFrame(data, columns=['tensplur', 'Word'])
+    df = pd.DataFrame(data, columns=['tensplur', 'word'])
     print('df is ready ...\n', df)
     return df
 
 
 if __name__ == '__main__':
 
-    df_toelf9400 = pd.read_excel(r'C:\Users\zjin6\Downloads\ecdict_cet6.xlsx')
-    word_list = df_toelf9400['Word'].tolist()
+    df_toelf9400 = pd.read_excel(r'C:\Users\zjin6\Downloads\toefl9400.xlsx')
+    word_list = df_toelf9400['word'].tolist()
     
     alltensplur_dict = batch_tensplur_todic(word_list)
     df_tensplur = dict_todf(alltensplur_dict)
     
-    merged_df = pd.merge(df_tensplur, df_toelf9400, on='Word', how='left')
-    merged_df.to_excel(r"C:\Users\zjin6\Downloads\ecdict_cet6_tensplur.xlsx")
+    merged_df = pd.merge(df_tensplur, df_toelf9400, on='word', how='left')
+    merged_df.to_excel(r"C:\Users\zjin6\Downloads\toefl9400_tensplur.xlsx")
 
 
 
