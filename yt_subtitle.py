@@ -9,7 +9,7 @@ from yt_video_audio import get_video_ids, get_save_path, pull_video_title, get_f
 
 @retry(max_attempts=12, sleep_time=5) 
 def get_language_code(video_id):
-    english_code_set = ['en', 'en-US', 'a.en']
+    english_code_set = ['en', 'en-US','en-GB', 'a.en']
     code_list = []
     transcripts = YouTubeTranscriptApi.list_transcripts(video_id)
     
