@@ -43,7 +43,7 @@ def get_save_path(input_path, default_path=r'D:\YT_temp2'):
     return save_path
 
 
-@retry(max_attempts=12, sleep_time=5) 
+@retry(max_attempts=24, sleep_time=5) 
 def get_video_audio(video_id, save_path, is_mp3):
     url_video = "https://www.youtube.com/watch?v=" + video_id
     def progress_callback(stream, chunk, bytes_remaining):
