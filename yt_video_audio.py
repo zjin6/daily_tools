@@ -57,7 +57,8 @@ def get_save_path(owner_playlist_title=None, base_path = r'D:\YT6', default_path
             save_path = input_path
     else:
         owner, playlist_title  = owner_playlist_title
-        folder_name = f"{owner} - {playlist_title}"
+        folder_name_initial = f"{owner} - {playlist_title}"
+        folder_name = re.sub('[<>:\/\\\|?*"#,.\']+', '', folder_name_initial)
         folder_path = os.path.join(base_path, folder_name)
 
         if not os.path.exists(folder_path):
