@@ -16,8 +16,7 @@ def fetch_video_ids(file_path):
 
 
 if __name__ == '__main__':   
-    input_path = input("path to save: ") 
-    save_path = get_save_path(input_path)
+    save_path = get_save_path(owner_playlist_title=None, base_path = r'D:\YT6', default_path=r'D:\YT_temp2')
 
     basename = os.path.basename(__file__)
     basename = basename.replace("_remedy", "")

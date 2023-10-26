@@ -35,15 +35,42 @@ def get_video_ids(yt_link):
     return video_ids 
 
 
-def get_save_path(input_path, default_path=r'D:\YT_temp2'):
-    if len(input_path) == 0:
-        save_path = default_path
+def get_owner_playlist_title(yt_link):
+    playlist = Playlist(yt_link)
+    try:
+        playlist_title = playlist.title
+        owner = playlist.owner
+        print("Owner:", owner)
+        print("Playlist Title:", playlist_title)
+        return owner, playlist_title
+    except Exception as e:
+        print('No playlist_title available: Exception- ' + str(e))
+        return None
+
+
+def get_save_path(owner_playlist_title=None, base_path = r'D:\YT6', default_path=r'D:\YT_temp2'):
+    if owner_playlist_title == None:
+        input_path = input("path to save: ")
+        if len(input_path) == 0:
+            save_path = default_path
+        else:
+            save_path = input_path
     else:
-        save_path = input_path
+        owner, playlist_title  = owner_playlist_title
+        folder_name = f"{owner} - {playlist_title}"
+        folder_path = os.path.join(base_path, folder_name)
+
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+            print(f"Folder '{folder_name}' created at {base_path}")
+        else:
+            print(f"Folder '{folder_name}' already exists at {base_path}")           
+        save_path = folder_path
+            
     return save_path
 
 
-@retry(max_attempts=12, sleep_time=5) 
+@retry(max_attempts=24, sleep_time=5) 
 def get_video_audio(video_id, save_path, is_mp3):
     url_video = "https://www.youtube.com/watch?v=" + video_id
     def progress_callback(stream, chunk, bytes_remaining):
@@ -102,12 +129,13 @@ def save_failur_downloadings(file_path, list_failed):
 
 
 def batch_video_audio(video_ids, save_path):   
-    is_mp3 = input("download MP3? Y/N: ").upper()   
+    is_mp3 = input("download MP3? Y/N: ").upper()
+    video_size = len(video_ids)
     
-    for video_id in video_ids:
+    for i, video_id in enumerate(video_ids):
         current_time = datetime.now().strftime("%H:%M")
         print("\n" + current_time)
-        print(video_id)
+        print(f'{i+1}/{video_size}: {video_id}')
         
         pull_video_title(video_id)
         get_video_audio(video_id, save_path, is_mp3)
@@ -119,9 +147,9 @@ def batch_video_audio(video_ids, save_path):
 
 if __name__ == '__main__':   
     yt_link = input("yt link: ")
-    input_path = input("path to save: ")    
+    owner_playlist_title =  get_owner_playlist_title(yt_link)
+    save_path = get_save_path(owner_playlist_title=owner_playlist_title, base_path = r'D:\YT6', default_path=r'D:\YT_temp2')
     
     video_ids = get_video_ids(yt_link)  
-    save_path = get_save_path(input_path)    
     batch_video_audio(video_ids, save_path)
     

@@ -3,7 +3,7 @@ import os
 import re
 from datetime import datetime
 from request_retry import retry, list_failed
-from yt_video_audio import get_video_ids, get_save_path, pull_video_title, get_failur_filepath, save_failur_downloadings
+from yt_video_audio import get_video_ids, get_owner_playlist_title, get_save_path, pull_video_title, get_failur_filepath, save_failur_downloadings
 
 
 
@@ -52,11 +52,12 @@ def convert_time(seconds):
 
 
 def batch_subtitle(video_ids, save_path):
+    subtile_size = len(video_ids)
     
-    for video_id in video_ids:
+    for i, video_id in enumerate(video_ids):
         current_time = datetime.now().strftime("%H:%M")
         print("\n" + current_time)
-        print(video_id)
+        print(f'{i+1}/{subtile_size}: {video_id}')
         
         video_title = pull_video_title(video_id)      
         filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
@@ -73,8 +74,8 @@ def batch_subtitle(video_ids, save_path):
 
 if __name__ == '__main__':    
     yt_link = input("yt link: ")
-    input_path = input("path to save: ")    
+    owner_playlist_title =  get_owner_playlist_title(yt_link)
+    save_path = get_save_path(owner_playlist_title=owner_playlist_title, base_path = r'D:\YT6', default_path=r'D:\YT_temp2')
     
     video_ids = get_video_ids(yt_link)
-    save_path = get_save_path(input_path)    
     batch_subtitle(video_ids, save_path)

@@ -17,7 +17,7 @@ def retry(max_attempts=None, sleep_time=0):
                     return result
                 except Exception as e:
                     attempts += 1
-                    if 'is unavailable' in str(e) or 'member' in str(e) or 'streamingData' in str(e):
+                    if 'is unavailable' in str(e) or 'member' in str(e) or 'streamingData' in str(e) or 'private' in str(e):
                         print("no authority to access, skip ...")
                         break
                     elif 'Subtitles are disabled' in str(e):
