@@ -7,6 +7,11 @@ ppt = pptx.Presentation(r"C:\Users\zjin6\Downloads\锂电池讲解材料-Anna.pp
 # Create a Translator object
 translator = Translator()
 
+
+
+# Save the translated PowerPoint file
+ppt.save(r'C:\Users\zjin6\Downloads\锂电池translated.pptx')
+
 # Loop through each slide in the PowerPoint file
 for slide in ppt.slides:
     # Loop through each shape on the slide
@@ -16,9 +21,14 @@ for slide in ppt.slides:
             # Get the original text
             text = shape.text_frame.text
             # Translate the text to English
-            translation = translator.translate(text, dest='en')
+            try:
+                translation = translator.translate(text, dest='en').text
+            except:
+                # Handle the error here (e.g., print an error message)
+                print('Translation error')
+                # Set the translation to the original text
+                translation = text
             # Replace the text in the shape with the translated text
-            shape.text_frame.text = translation.text
+            shape.text_frame.text = translation
 
-# Save the translated PowerPoint file
 ppt.save(r'C:\Users\zjin6\Downloads\锂电池translated.pptx')
