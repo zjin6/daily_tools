@@ -50,7 +50,7 @@ def url2html(driver, url, path_folder=r'C:\Users\zjin6\Downloads\url2html'):
 
 if __name__ == '__main__':
     driver = init_chrome_driver()
-    url = 'https://flights.ctrip.com/online/list/oneway-ckg-sha?_=1&depdate=2024-02-29&cabin=Y_S_C_F'
+    url = 'https://bpms.chongqing.ford.com:8081/newPage/PProject/ECC_TrackingForAll'
     url2html(driver, url)
 
     
