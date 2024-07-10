@@ -2,7 +2,7 @@ import pptx
 from googletrans import Translator
 
 # Open the PowerPoint file
-ppt = pptx.Presentation(r"C:\Users\zjin6\Downloads\锂电池讲解材料-Anna.pptx")
+ppt = pptx.Presentation(r'D:\锂电池讲解材料-Anna.pptx')
 
 # Create a Translator object
 translator = Translator()
@@ -21,4 +21,4 @@ for slide in ppt.slides:
             shape.text_frame.text = translation.text
 
 # Save the translated PowerPoint file
-ppt.save(r'C:\Users\zjin6\Downloads\锂电池translated.pptx')
+ppt.save(r'D:\锂电池translated.pptx')
