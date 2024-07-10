@@ -1,10 +1,35 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+
+# Specify the correct path to your ChromeDriver executable
+chrome_driver_path = r'C:\Users\zjin6\chromedriver.exe'
+
+# Create a Service object with the path to ChromeDriver
+service = Service(chrome_driver_path)
+
+# If you have Chrome options you want to use, initialize them here
+options = webdriver.ChromeOptions()
+# Add any options you need
+# options.add_argument('--headless')  # Example for headless mode
+
+# Initialize the Chrome WebDriver with the specified service and options
+driver = webdriver.Chrome(service=service, options=options)
+
+# Now you can interact with the Chrome browser using the 'driver' object
+# For example, open a webpage:
+driver.get('https://www.bing.com')
+
+# When you're done, make sure to quit the driver to close the browser
+# driver.quit()
+
+
+
 from datetime import datetime
 import time
 
 
 print('setting chrome webdriver headless ... ')
-options = webdriver.ChromeOptions()
+# options = webdriver.ChromeOptions()
 options.add_argument("--headless")
 
 
