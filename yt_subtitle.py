@@ -1,6 +1,6 @@
 from youtube_transcript_api import YouTubeTranscriptApi
-import os
-import re
+import os, re
+from pytube import YouTube
 from datetime import datetime
 from request_retry import retry, list_failed
 from yt_video_audio import get_video_ids, get_owner_playlist_title, get_save_path, pull_video_title, get_failur_filepath, save_failur_downloadings
@@ -60,9 +60,17 @@ def batch_subtitle(video_ids, save_path):
         print(f'{i+1}/{subtile_size}: {video_id}')
         
         video_title = pull_video_title(video_id)      
-        filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'
-         
+        filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'         
         filepath = os.path.join(save_path, filename)
+        
+        # url_video = "https://www.youtube.com/watch?v=" + video_id
+        # yt = YouTube(url_video)
+        # ys = yt.streams.filter(only_audio=True).first()
+        # file_name = ys.default_filename  # Get the default file name
+        # out_file = os.path.join(save_path, file_name)  # Construct the full path
+        # base, ext = os.path.splitext(out_file)
+        # filepath = base + '.srt'       
+        
         code_list = get_language_code(video_id)
         if code_list:
             english_subtitle(video_id, filepath, code_list[0])
@@ -75,7 +83,39 @@ def batch_subtitle(video_ids, save_path):
 if __name__ == '__main__':    
     yt_link = input("yt link: ")
     owner_playlist_title =  get_owner_playlist_title(yt_link)
-    save_path = get_save_path(owner_playlist_title=owner_playlist_title, base_path = r'D:\YT6', default_path=r'D:\YT_temp2')
+    save_path = get_save_path(owner_playlist_title=owner_playlist_title, base_path = r'D:\YT5', default_path=r'D:\YT_temp2')
     
     video_ids = get_video_ids(yt_link)
     batch_subtitle(video_ids, save_path)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

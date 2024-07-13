@@ -96,7 +96,7 @@ def get_video_audio(video_id, save_path, is_mp3):
     os.rename(out_file, audio_file)   
 
     if is_mp3 !='Y' :         
-        resolutions = ["1080p", "720p",  "480p", "360p"]
+        resolutions = ["1080p",  "720p", "480p", "360p"]
         for res in resolutions:
             video_stream = yt.streams.filter(res=res, mime_type="video/mp4").first()
             if video_stream:
