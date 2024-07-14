@@ -1,6 +1,6 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 import os, re
-from pytube import YouTube
+# from pytube import YouTube
 from datetime import datetime
 from request_retry import retry, list_failed
 from yt_video_audio import get_video_ids, get_owner_playlist_title, get_save_path, pull_video_title, get_failur_filepath, save_failur_downloadings

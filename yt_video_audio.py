@@ -72,7 +72,7 @@ def get_save_path(owner_playlist_title=None, base_path = r'D:\YT6', default_path
 
 
 @retry(max_attempts=24, sleep_time=5) 
-def get_video_audio(video_id, save_path, is_mp3):
+def get_audio(video_id, save_path):
     url_video = "https://www.youtube.com/watch?v=" + video_id
     def progress_callback(stream, chunk, bytes_remaining):
         total_size = ys.filesize
@@ -94,33 +94,55 @@ def get_video_audio(video_id, save_path, is_mp3):
     base, ext = os.path.splitext(out_file) # rename to _au.mp3
     audio_file = base + '_au.mp4'
     os.rename(out_file, audio_file)   
-
-    if is_mp3 !='Y' :         
-        resolutions = ["1080p",  "720p", "480p", "360p"]
-        for res in resolutions:
-            video_stream = yt.streams.filter(res=res, mime_type="video/mp4").first()
-            if video_stream:
-                break             
-        ys = video_stream
-        filesize += video_stream.filesize        
-        print(f"\nvideo = {int(video_stream.filesize / 10**6)} MB, res: {res}")
-               
-        out_file = video_stream.download(save_path)       
-        base, ext = os.path.splitext(out_file) # rename to _vi.mp4
-        video_file = base + '_vi.mp4'
-        os.rename(out_file, video_file)
-        
-        merge_file = base + '.mp4'   
-        merge_video_audio(video_file, audio_file, merge_file, del_raw=True) 
-    
+   
     total_time_spent = datetime.now() - start
     total_seconds = total_time_spent.total_seconds()
     download_speed = filesize/10**6 / total_seconds * 60 # convert to MB/min
     print('time spent: ' + str(total_time_spent).split('.')[0])          
     print(f'overall speed: {download_speed:.1f} MB/min')
+    
+    return audio_file
+ 
+    
+@retry(max_attempts=24, sleep_time=5) 
+def get_video(video_id, save_path):
+    url_video = "https://www.youtube.com/watch?v=" + video_id
+    def progress_callback(stream, chunk, bytes_remaining):
+        total_size = ys.filesize
+        progress_percent = ((total_size - bytes_remaining) / total_size) * 100
+        time_spent = datetime.now() - start
+        minutes_left = round(time_spent.total_seconds() / progress_percent * (100 - progress_percent) /60, 1)
+        print(str(int(progress_percent)) + '% | ' + str(minutes_left) + 'mins ... ', end='')        
+            
+    start = datetime.now()        
+    yt = YouTube(url_video, on_progress_callback = progress_callback)
+           
+    resolutions = ["1080p", "720p", "480p", "360p"]
+    for res in resolutions:
+        video_stream = yt.streams.filter(res=res, mime_type="video/mp4").first()
+        if video_stream:
+            break             
+    ys = video_stream
+    filesize = video_stream.filesize        
+    print(f"video = {int(filesize / 10**6)} MB, res: {res}")
+           
+    out_file = video_stream.download(save_path)       
+    base, ext = os.path.splitext(out_file) # rename to _vi.mp4
+    video_file = base + '_vi.mp4'
+    os.rename(out_file, video_file)
+    
+    merge_file = base + '.mp4'   
+   
+    total_time_spent = datetime.now() - start
+    total_seconds = total_time_spent.total_seconds()
+    download_speed = filesize/10**6 / total_seconds * 60 # convert to MB/min
+    print('time spent: ' + str(total_time_spent).split('.')[0])          
+    print(f'overall speed: {download_speed:.1f} MB/min') 
+    
+    return merge_file, video_file   
    
 
-def merge_video_audio(video_path, audio_path, merge_path, del_raw=True):
+def merge_video_audio(merge_path, video_path, audio_path, del_raw=True):
     command = f'ffmpeg -i "{video_path}" -i "{audio_path}" -c copy "{merge_path}"'
     print('\n' + command, end=' ...... ')
     subprocess.call(command, shell=True)
@@ -168,8 +190,15 @@ def batch_video_audio(video_ids, save_path):
         print(f'{i+1}/{video_size}: {video_id}')
         
         pull_video_title(video_id)
-        get_video_audio(video_id, save_path, is_mp3)
-       
+        audio_path = get_audio(video_id, save_path)
+        
+        if  is_mp3 != "Y":       
+            try:
+                merge_path, video_path =  get_video(video_id, save_path)
+                merge_video_audio(merge_path, video_path, audio_path, del_raw=True) 
+            except Exception as e:
+                print(e)
+               
     basename = os.path.basename(__file__)
     file_path = get_failur_filepath(save_path, basename)
     save_failur_downloadings(file_path, list_failed)    
@@ -183,3 +212,27 @@ if __name__ == '__main__':
     video_ids = get_video_ids(yt_link)  
     batch_video_audio(video_ids, save_path)
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
