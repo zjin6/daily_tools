@@ -10,7 +10,10 @@ from yt_video_audio import get_video_ids, get_owner_playlist_title, get_save_pat
 @retry(max_attempts=12, sleep_time=5) 
 def get_language_code(video_id):
     english_code_set = ['en', 'en-US','en-GB', 'a.en']
-    code_list = []
+    en_code_list = []
+    chinese_code_set = ['zh', 'zh-TW', 'zh-CN']
+    zh_code_list = []    
+    
     transcripts = YouTubeTranscriptApi.list_transcripts(video_id)
     
     print("Available Language Code: ", end='')
@@ -18,19 +21,22 @@ def get_language_code(video_id):
         language_code = transcript.language_code
         print(language_code, end=' ')
         if language_code in english_code_set:
-            code_list.append(language_code)
-    return code_list
+            en_code_list.append(language_code)
+        if language_code in chinese_code_set:
+            zh_code_list.append(language_code)            
+            
+    return en_code_list, zh_code_list # return both English and Chinese language codes
 
 
 @retry(max_attempts=12, sleep_time=5)  
-def english_subtitle(video_id, filepath, language_code):
-    # Get the transcript for the YouTube video in English
-    transcript_en = YouTubeTranscriptApi.get_transcript(video_id, languages=[language_code])
+def download_subtitle(video_id, filepath, language_code):
+    # Get the transcript for the YouTube video
+    transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=[language_code])
 
     # Create an English .srt file
     with open(filepath, 'w', encoding='utf-8') as f:
         # Write each English subtitle entry to the .srt file
-        for index, line in enumerate(transcript_en):
+        for index, line in enumerate(transcript):
             start_time = line['start']
             end_time = line['start'] + line['duration']
             subtitle_text = line['text']
@@ -60,8 +66,11 @@ def batch_subtitle(video_ids, save_path):
         print(f'{i+1}/{subtile_size}: {video_id}')
         
         video_title = pull_video_title(video_id)      
-        filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'         
-        filepath = os.path.join(save_path, filename)
+        en_filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '.srt'         
+        en_filepath = os.path.join(save_path, en_filename)
+        zh_filename = re.sub('[<>:\/\\\|?*"#,.\']+', '', video_title) + '_zh.srt'         
+        zh_filepath = os.path.join(save_path, zh_filename)        
+        
         
         # url_video = "https://www.youtube.com/watch?v=" + video_id
         # yt = YouTube(url_video)
@@ -71,10 +80,16 @@ def batch_subtitle(video_ids, save_path):
         # base, ext = os.path.splitext(out_file)
         # filepath = base + '.srt'       
         
-        code_list = get_language_code(video_id)
-        if code_list:
-            english_subtitle(video_id, filepath, code_list[0])
-    
+
+        code_lists = get_language_code(video_id) # get both list for en and zh language codes
+        if code_lists:
+            en_code_list, zh_code_list = code_lists 
+            if en_code_list:
+                download_subtitle(video_id, en_filepath, en_code_list[0])
+            if zh_code_list:
+                download_subtitle(video_id, zh_filepath, zh_code_list[0])            
+           
+   
     basename = os.path.basename(__file__)
     file_path = get_failur_filepath(save_path, basename)
     save_failur_downloadings(file_path, list_failed)    
